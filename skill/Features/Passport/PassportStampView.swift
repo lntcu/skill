@@ -9,7 +9,7 @@ struct PassportStampView: View {
             let side = min(geometry.size.width, geometry.size.height) * 0.6
             let bound = side * 1.42
             VStack(spacing: 8) {
-                Image(systemName: skill.stampSymbol ?? "globe")
+                Image(systemName: skill.iconName)
                     .font(.largeTitle)
                 Text(skill.name)
                     .font(.headline)

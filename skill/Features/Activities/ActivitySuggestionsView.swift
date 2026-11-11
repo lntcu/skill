@@ -26,27 +26,11 @@ struct ActivitySuggestionsView: View {
                     }
                 }
             }
-            if loading && !options.isEmpty { LoadingView(text: "Finding activities…") }
-            if let error, !options.isEmpty {
+            if loading { LoadingView(text: "Finding activities…") }
+            if let error {
                 Section {
                     Text(error).foregroundStyle(.secondary)
                     Button("Try Again") { attempt += 1 }
-                }
-            }
-        }
-        .overlay {
-            if options.isEmpty {
-                if loading {
-                    LoadingView(text: "Finding activities…")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                        .padding()
-                } else if let error {
-                    VStack(alignment: .leading, spacing: 16) {
-                        EmptyStateView(title: "No Activities Yet", symbol: "list.bullet", message: error)
-                            .fixedSize(horizontal: false, vertical: true)
-                        Button("Try Again") { attempt += 1 }.padding(.horizontal)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 }
             }
         }

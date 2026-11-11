@@ -70,6 +70,11 @@ struct NewSkillView: View {
         .disabled(saving)
         .navigationTitle("New Skill")
         .navigationBarBackButtonHidden(saving)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() }.disabled(saving)
+            }
+        }
         .safeAreaInset(edge: .bottom) {
             Button("Add New Skill", action: addSkill)
                 .bottomActionStyle()

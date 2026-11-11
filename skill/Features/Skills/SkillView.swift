@@ -5,7 +5,19 @@ struct SkillView: View {
     let skill: Skill
     @State private var showingActivity = false
     @State private var showingSettings = false
+    @State private var showingCelebration = false
+    @State private var previouslyMastered: Bool
     @State private var selectedActivity: Activity?
+
+    init(skill: Skill) {
+        self.skill = skill
+        _previouslyMastered = State(initialValue: skill.isMastered)
+    }
+
+    private func checkCompletion() {
+        if !previouslyMastered && skill.isMastered { showingCelebration = true }
+        previouslyMastered = skill.isMastered
+    }
 
     private var completed: [Activity] {
         skill.activities.filter(\.isCompleted)
@@ -20,9 +32,7 @@ struct SkillView: View {
             }
             Section("Completed Activities") {
                 if completed.isEmpty {
-                    EmptyStateView(title: "No Completed Activities Yet", symbol: "checkmark.circle")
-                        .frame(minHeight: 180)
-                        .listRowInsets(EdgeInsets())
+                    ListPlaceholderView(text: "No Completed Activities Yet", symbol: "checkmark.circle")
                 }
                 ForEach(completed) { activity in
                     Button { selectedActivity = activity } label: {
@@ -38,8 +48,11 @@ struct SkillView: View {
                 Button("Skill Settings", systemImage: "gearshape") { showingSettings = true }
             }
         }
-        .sheet(isPresented: $showingSettings) {
+        .sheet(isPresented: $showingSettings, onDismiss: checkCompletion) {
             NavigationStack { SkillSettingsView(skill: skill) }
+        }
+        .fullScreenCover(isPresented: $showingCelebration) {
+            SkillCelebrationView(skill: skill)
         }
         .sheet(item: $selectedActivity) { activity in
             NavigationStack { CompletedActivityDetailView(activity: activity) }
@@ -48,7 +61,7 @@ struct SkillView: View {
             Button("Start New Activity") { showingActivity = true }
                 .bottomActionStyle()
         }
-        .sheet(isPresented: $showingActivity) {
+        .sheet(isPresented: $showingActivity, onDismiss: checkCompletion) {
             NavigationStack {
                 NewActivityView(skill: skill) { showingActivity = false }
             }

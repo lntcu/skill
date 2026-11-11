@@ -32,9 +32,7 @@ final class Skill {
         }
         if stampX == nil { stampX = Double.random(in: -1...1) }
         if stampY == nil { stampY = Double.random(in: -1...1) }
-        if stampSymbol == nil {
-            stampSymbol = ["camera", "location.north", "paintbrush.pointed", "music.note", "leaf", "mountain.2", "sailboat", "book", "flame", "bicycle", "globe", "hammer"].randomElement()
-        }
+        stampSymbol = iconName
     }
 
     static var examples: [Skill] {
@@ -52,32 +50,3 @@ final class Skill {
     }
 }
 
-@Model
-final class Activity {
-    var name: String
-    var isCompleted: Bool
-    var details: String = ""
-    var targets: [String] = []
-    var checkedTargets: [Int] = []
-    var durationMinutes: Int = 0
-    var completedAt: Date? = nil
-    @Attribute(.externalStorage) var photo: Data? = nil
-
-    init(_ name: String, isCompleted: Bool = false) {
-        self.name = name
-        self.isCompleted = isCompleted
-    }
-}
-
-@MainActor
-func previewContainer() -> ModelContainer {
-    let container = try! ModelContainer(for: Skill.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-    Skill.examples.forEach { container.mainContext.insert($0) }
-    return container
-}
-
-extension String {
-    var formattedSkillName: String {
-        trimmingCharacters(in: .whitespacesAndNewlines).capitalized(with: .current)
-    }
-}

@@ -24,9 +24,7 @@ struct CompletedActivityDetailView: View {
             }
             Section("Targets") {
                 if activity.targets.isEmpty {
-                    EmptyStateView(title: "No Targets Saved", symbol: "checklist")
-                        .frame(minHeight: 140)
-                        .listRowInsets(EdgeInsets())
+                    ListPlaceholderView(text: "No Targets Saved", symbol: "checklist")
                 }
                 ForEach(activity.targets.indices, id: \.self) { index in
                     Label(activity.targets[index], systemImage: activity.checkedTargets.contains(index) ? "checkmark.circle.fill" : "circle")
