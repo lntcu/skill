@@ -3,58 +3,56 @@ import SwiftData
 
 struct SkillView: View {
     let skill: Skill
+    @State private var showingActivity = false
+    @State private var showingSettings = false
+    @State private var selectedActivity: Activity?
 
     private var completed: [Activity] {
         skill.activities.filter(\.isCompleted)
     }
 
-    private var progress: Double {
-        skill.activities.isEmpty ? 0 : Double(completed.count) / Double(skill.activities.count)
-    }
-
     var body: some View {
         List {
             Section("Progress") {
-				ZStack(alignment: .leading) {
-					GeometryReader { geometry in
-						ZStack(alignment: .leading) {
-							RoundedRectangle(cornerRadius: 25)
-								.fill(.clear)
-								.glassEffect(.regular)
-
-							RoundedRectangle(cornerRadius: 25)
-								.fill(.clear)
-								.glassEffect(.regular.tint(.black.opacity(0.2)))
-								.frame(width: geometry.size.width * progress)
-						}
-					}
-					.frame(height: 30)
-					Text("\(progress.formatted(.percent.precision(.fractionLength(0))))")
-						.padding(.horizontal)
-				}
+                SkillProgressView(progress: skill.progress)
+                LabeledContent("Activities Completed", value: "\(skill.completedCount) / \(skill.requiredActivities)")
+                if skill.isMastered { Label("Stamp Earned", systemImage: "checkmark.seal") }
             }
             Section("Completed Activities") {
                 if completed.isEmpty {
-                    Text("No completed activities yet")
-                        .foregroundStyle(.secondary)
+                    EmptyStateView(title: "No Completed Activities Yet", symbol: "checkmark.circle")
+                        .frame(minHeight: 180)
+                        .listRowInsets(EdgeInsets())
                 }
                 ForEach(completed) { activity in
-                    Label(activity.name, systemImage: "checkmark.circle.fill")
-						.foregroundStyle(.black)
+                    Button { selectedActivity = activity } label: {
+                        Label(activity.name, systemImage: "checkmark.circle.fill")
+                    }
+                    .foregroundStyle(.black)
                 }
             }
         }
         .navigationTitle(skill.name)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Skill Settings", systemImage: "gearshape") { showingSettings = true }
+            }
+        }
+        .sheet(isPresented: $showingSettings) {
+            NavigationStack { SkillSettingsView(skill: skill) }
+        }
+        .sheet(item: $selectedActivity) { activity in
+            NavigationStack { CompletedActivityDetailView(activity: activity) }
+        }
         .safeAreaInset(edge: .bottom) {
-            NavigationLink {
-                NewActivityView()
-			} label: {
-				Text("Start New Activity")
-					.foregroundStyle(.black)
-					.padding()
-					.glassEffect(.regular.interactive())
-			}
-            .frame(maxWidth: .infinity)
+            Button("Start New Activity") { showingActivity = true }
+                .bottomActionStyle()
+        }
+        .sheet(isPresented: $showingActivity) {
+            NavigationStack {
+                NewActivityView(skill: skill) { showingActivity = false }
+            }
+            .interactiveDismissDisabled()
         }
     }
 }

@@ -12,6 +12,11 @@ struct SkillsView: View {
 				Text(skill.name)
 			}
         }
+        .overlay {
+            if skills.isEmpty {
+                EmptyStateView(title: "No Skills Yet", symbol: "list.bullet", message: "Add a skill to start learning.")
+            }
+        }
         .navigationTitle("Skills")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

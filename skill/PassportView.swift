@@ -6,31 +6,24 @@ struct PassportView: View {
     @Query(sort: \Skill.name) private var skills: [Skill]
     @State private var page = 0
 
-    private var pageCount: Int { max(1, (skills.count + 5) / 6) }
+    private var stamps: [Skill] { skills.filter(\.isMastered) }
+
+    private var pageCount: Int { max(1, (stamps.count + 5) / 6) }
     private var currentPage: Int { min(page, pageCount - 1) }
 
     var body: some View {
         VStack {
             GeometryReader { geometry in
                 ScrollView {
-                    if skills.isEmpty {
-                        ContentUnavailableView("No Stamps Yet", systemImage: "book.closed",
-                                               description: Text("Each skill adds a stamp to your passport."))
+                    if stamps.isEmpty {
+                        EmptyStateView(title: "No Stamps Yet", symbol: "book.closed",
+                                       message: "Reach a skill’s activity goal to earn its stamp.")
+                            .frame(minHeight: geometry.size.height)
                     } else {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 24) {
-                            ForEach(Array(skills.dropFirst(currentPage * 6).prefix(6))) { skill in
-                                VStack(spacing: 8) {
-                                    Image(systemName: "seal")
-                                        .font(.largeTitle)
-                                    Text(skill.name)
-                                        .font(.headline)
-                                        .multilineTextAlignment(.center)
-                                }
-                                .foregroundStyle(Color(hue: skill.stampHue ?? 0.5, saturation: 0.65, brightness: 0.7))
-                                .frame(maxWidth: .infinity, minHeight: 100)
-                                .padding(8)
-                                .rotationEffect(.degrees(skill.stampRotation))
-                                .offset(x: skill.stampOffset, y: skill.stampOffset)
+                            ForEach(Array(stamps.dropFirst(currentPage * 6).prefix(6))) { skill in
+                                PassportStampView(skill: skill)
+                                    .frame(height: 200)
                             }
                         }
                         .padding()

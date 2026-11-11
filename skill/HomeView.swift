@@ -7,7 +7,7 @@ struct HomeView: View {
 
     var body: some View {
         List {
-            LabeledContent("Stamps Collected", value: "\(skills.count)")
+            LabeledContent("Stamps Collected", value: "\(skills.filter(\.isMastered).count)")
             Button("View Passport") {
                 showingPassport = true
             }

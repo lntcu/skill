@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct NewActivityView: View {
+    let skill: Skill
+    var onComplete: () -> Void
+    @Environment(\.dismiss) private var dismiss
     @State private var energy = "Okay"
     @State private var minutes = 30
 
@@ -16,19 +19,22 @@ struct NewActivityView: View {
             }
         }
         .navigationTitle("New Activity")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() }
+            }
+        }
         .safeAreaInset(edge: .bottom) {
-            Button("Next", action: {})
-                .buttonStyle(.borderedProminent)
-                .disabled(true)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(.bar)
+            NavigationLink("Next") {
+                ActivitySuggestionsView(skill: skill, energy: energy, minutes: minutes, onComplete: onComplete)
+            }
+            .bottomActionStyle()
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        NewActivityView()
+        NewActivityView(skill: Skill.examples[0], onComplete: {})
     }
 }
