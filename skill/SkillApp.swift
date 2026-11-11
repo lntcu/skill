@@ -1,9 +1,12 @@
 import SwiftUI
+import SwiftData
 
-@main struct MyApp: App {
+@main
+struct SkillApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Skill.self)
     }
 }
