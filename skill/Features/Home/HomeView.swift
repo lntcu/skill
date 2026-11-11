@@ -13,17 +13,12 @@ struct HomeView: View {
             }
             Section {
                 IslandMapView(skills: skills)
-                ForEach(Array(skills.enumerated()), id: \.element.persistentModelID) { index, skill in
-                    NavigationLink {
-                        SkillView(skill: skill)
-                    } label: {
-                        LabeledContent("[\(index + 1)] \(skill.name)", value: skill.isMastered ? "Unlocked" : skill.progress.formatted(.percent.precision(.fractionLength(0))))
-                    }
-                }
+                    .frame(height: skills.isEmpty ? 50 : 460)
+                    .listRowInsets(EdgeInsets())
             } header: {
                 Text("Your Islands")
             } footer: {
-                Text("Each skill is an island. Complete activities to uncover its terrain and reach the goal to fully unlock it.")
+                Text("Drag to explore, pinch or double-tap to zoom. Tap an island to visit its skill. Complete its goal to fully unlock it.")
             }
         }
         .navigationTitle("Home")

@@ -14,11 +14,11 @@ struct SkillProgressView: View {
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 25)
                     .fill(.clear)
-                    .glassEffect(.regular)
+					.glassEffect(.regular.interactive())
                 if fill > 0 {
                     RoundedRectangle(cornerRadius: 25)
                         .fill(.clear)
-                        .glassEffect(.regular.tint(.black.opacity(0.2)))
+						.glassEffect(.regular.tint(.black.opacity(0.2)).interactive())
                         .frame(width: fill)
                 }
                 Text(progress.formatted(.percent.precision(.fractionLength(0))))

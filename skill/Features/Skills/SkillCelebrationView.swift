@@ -5,13 +5,13 @@ struct SkillCelebrationView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(spacing: 24) {
-            BloomingFireworkView()
-                .frame(maxHeight: 360)
+        ZStack {
+            BloomingFireworkView().ignoresSafeArea()
             Text("Completed \(skill.name)")
                 .font(.title2.weight(.medium))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+                .shadow(color: .white, radius: 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.white)

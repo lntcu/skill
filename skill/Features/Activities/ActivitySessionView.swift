@@ -5,18 +5,55 @@ struct ActivitySessionView: View {
     let activity: ActivitySuggestion
     let minutes: Int
     var onComplete: () -> Void
-    @State private var deadline: Date?
+    @State private var timer: ActivityTimer
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var checked: Set<Int> = []
     @State private var ended = false
+
+    init(skill: Skill, activity: ActivitySuggestion, minutes: Int, onComplete: @escaping () -> Void) {
+        self.skill = skill
+        self.activity = activity
+        self.minutes = minutes
+        self.onComplete = onComplete
+        _timer = State(initialValue: ActivityTimer(duration: Double(minutes * 60)))
+    }
 
     var body: some View {
         List {
             Section {
                 Text(activity.title).font(.headline)
-                if let deadline {
-                    Text(timerInterval: min(Date.now, deadline)...deadline, countsDown: true)
-                        .font(.largeTitle.monospacedDigit())
-                        .accessibilityLabel("Time remaining")
+                if timer.hasStarted {
+                    HStack {
+                        if let deadline = timer.deadline {
+                            Text(timerInterval: min(Date.now, deadline)...deadline, countsDown: true)
+                                .font(.largeTitle.monospacedDigit())
+                                .accessibilityLabel("Time remaining")
+                        } else {
+                            let seconds = Int(ceil(timer.remaining(at: Date.now)))
+                            Text(String(format: "%d:%02d", seconds / 60, seconds % 60))
+                                .font(.largeTitle.monospacedDigit())
+                                .accessibilityLabel("Time remaining")
+                        }
+                        Spacer()
+						GlassEffectContainer {
+							HStack {
+								Button("Reset Timer", systemImage: "arrow.counterclockwise") { timer.reset() }
+									.padding()
+								Button(timer.deadline == nil ? "Continue Timer" : "Pause Timer",
+									   systemImage: timer.deadline == nil ? "play.fill" : "pause.fill") { timer.togglePause() }
+									.disabled(timer.remaining(at: Date.now) == 0)
+									.padding()
+							}
+						}
+						.glassEffect()
+                    }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.borderless)
+                    TimelineView(.animation(minimumInterval: reduceMotion ? 1 : 1.0 / 30,
+                                            paused: timer.deadline == nil || scenePhase != .active)) { timeline in
+                        SkillProgressView(progress: timer.progress(at: timeline.date))
+                    }
                 } else {
                     Text(activity.description)
                 }
@@ -34,11 +71,11 @@ struct ActivitySessionView: View {
             }
         }
         .navigationTitle("Activity")
-        .navigationBarBackButtonHidden(deadline != nil)
+        .navigationBarBackButtonHidden(timer.hasStarted)
         .safeAreaInset(edge: .bottom) {
-            Button(deadline == nil ? "Start Activity" : "End Activity") {
-                if deadline == nil {
-                    deadline = Date.now.addingTimeInterval(Double(minutes * 60))
+            Button(timer.hasStarted ? "End Activity" : "Start Activity") {
+                if !timer.hasStarted {
+                    timer.start()
                 } else {
                     ended = true
                 }
