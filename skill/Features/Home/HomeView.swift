@@ -4,7 +4,7 @@ import SwiftData
 struct HomeView: View {
     @Query(sort: \Skill.name) private var skills: [Skill]
     @State private var showingPassport = false
-
+    @State private var showingGallery = false
     private var stampCount: Int { skills.filter(\.isMastered).count }
 
     var body: some View {
@@ -23,8 +23,14 @@ struct HomeView: View {
                     }
                 }
                 Button("View Passport") { showingPassport = true }
+    
             } header: {
                 Text("Passport")
+            }
+            Section {
+                Button("View Gallery") { showingGallery = true }
+            } header: {
+                Text("Gallery")
             }
             Section {
                 IslandMapView(skills: skills)
@@ -42,6 +48,11 @@ struct HomeView: View {
         .sheet(isPresented: $showingPassport) {
             NavigationStack {
                 PassportView()
+            }
+        }
+        .sheet(isPresented: $showingGallery) {
+            NavigationStack {
+                GalleryView()
             }
         }
     }

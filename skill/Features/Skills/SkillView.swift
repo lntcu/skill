@@ -3,6 +3,7 @@ import SwiftData
 
 struct SkillView: View {
     let skill: Skill
+    @Environment(\.dismiss) private var dismiss
     @State private var showingActivity = false
     @State private var showingSettings = false
     @State private var showingCelebration = false
@@ -15,6 +16,10 @@ struct SkillView: View {
     }
 
     private func checkCompletion() {
+        if skill.isDeleted || skill.modelContext == nil {
+            dismiss()
+            return
+        }
         if !previouslyMastered && skill.isMastered { showingCelebration = true }
         previouslyMastered = skill.isMastered
     }

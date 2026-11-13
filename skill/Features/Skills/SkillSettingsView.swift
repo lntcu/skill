@@ -9,6 +9,7 @@ struct SkillSettingsView: View {
     @State private var name: String
     @State private var target: Int
     @State private var error: String?
+    @State private var confirmDelete = false
 
     init(skill: Skill) {
         self.skill = skill
@@ -33,11 +34,25 @@ struct SkillSettingsView: View {
             }
             if duplicate { Text("You already have this skill.").foregroundStyle(.secondary) }
             if let error { Text(error).foregroundStyle(.red) }
+            Section {
+                Button("Delete Skill", role: .destructive) { confirmDelete = true }
+            }
         }
         .navigationTitle("Skill Settings")
         .navigationBarTitleDisplayMode(.inline)
         .appScreenBackground()
         .tint(.accentTeal)
+        .alert("Delete Skill?", isPresented: $confirmDelete) {
+            Button("Delete", role: .destructive) {
+                context.delete(skill)
+                do {
+                    try context.save()
+                    dismiss()
+                } catch {
+                    self.error = "Couldn't delete skill. Please try again."
+                }
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }
