@@ -23,9 +23,9 @@ struct CompleteActivityView: View {
                 Text(activity.title)
                     .font(.headline)
                 if let photo, let image = UIImage(data: photo) {
-					Image(uiImage: image).resizable().scaledToFit()
-						.clipShape(.rect(cornerRadius: 16))
-						.glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16))
+                    Image(uiImage: image).resizable().scaledToFit()
+                        .clipShape(.rect(cornerRadius: 16))
+                        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16))
                 }
                 PhotosPicker(selection: $photoItem, matching: .images) {
                     Text("Upload Photo")
@@ -41,6 +41,8 @@ struct CompleteActivityView: View {
         }
         .navigationTitle("Completed")
         .navigationBarBackButtonHidden()
+        .appScreenBackground()
+        .tint(.accentTeal)
         .safeAreaInset(edge: .bottom) {
             Button("Complete Activity", action: complete)
                 .bottomActionStyle()

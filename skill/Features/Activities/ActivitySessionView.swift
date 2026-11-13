@@ -36,17 +36,17 @@ struct ActivitySessionView: View {
                                 .accessibilityLabel("Time remaining")
                         }
                         Spacer()
-						GlassEffectContainer {
-							HStack {
-								Button("Reset Timer", systemImage: "arrow.counterclockwise") { timer.reset() }
-									.padding()
-								Button(timer.deadline == nil ? "Continue Timer" : "Pause Timer",
-									   systemImage: timer.deadline == nil ? "play.fill" : "pause.fill") { timer.togglePause() }
-									.disabled(timer.remaining(at: Date.now) == 0)
-									.padding()
-							}
-						}
-						.glassEffect()
+                        GlassEffectContainer {
+                            HStack {
+                                Button("Reset Timer", systemImage: "arrow.counterclockwise") { timer.reset() }
+                                    .padding()
+                                Button(timer.deadline == nil ? "Continue Timer" : "Pause Timer",
+                                       systemImage: timer.deadline == nil ? "play.fill" : "pause.fill") { timer.togglePause() }
+                                    .disabled(timer.remaining(at: Date.now) == 0)
+                                    .padding()
+                            }
+                        }
+                        .glassEffect()
                     }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
@@ -64,13 +64,16 @@ struct ActivitySessionView: View {
                         if !checked.insert(index).inserted { checked.remove(index) }
                     } label: {
                         Label(activity.targets[index], systemImage: checked.contains(index) ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(checked.contains(index) ? Color.accentTeal : Color.primary)
                     }
                     .buttonStyle(.plain)
                     .accessibilityValue(checked.contains(index) ? "Checked" : "Unchecked")
                 }
             }
         }
+        .appScreenBackground()
         .navigationTitle("Activity")
+        .tint(.accentTeal)
         .navigationBarBackButtonHidden(timer.hasStarted)
         .safeAreaInset(edge: .bottom) {
             Button(timer.hasStarted ? "End Activity" : "Start Activity") {
@@ -83,8 +86,13 @@ struct ActivitySessionView: View {
             .bottomActionStyle()
         }
         .navigationDestination(isPresented: $ended) {
-            CompleteActivityView(skill: skill, activity: activity, minutes: minutes, checked: checked, onComplete: onComplete)
+            CompleteActivityView(skill: skill, activity: activity, minutes: elapsedMinutes, checked: checked, onComplete: onComplete)
         }
+    }
+
+    private var elapsedMinutes: Int {
+        let spent = timer.duration - timer.remaining(at: .now)
+        return max(1, min(minutes, Int((spent / 60).rounded())))
     }
 }
 

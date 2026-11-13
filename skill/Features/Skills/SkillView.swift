@@ -20,7 +20,9 @@ struct SkillView: View {
     }
 
     private var completed: [Activity] {
-        skill.activities.filter(\.isCompleted)
+        skill.activities
+            .filter(\.isCompleted)
+            .sorted { ($0.completedAt ?? .distantPast) > ($1.completedAt ?? .distantPast) }
     }
 
     var body: some View {
@@ -28,7 +30,10 @@ struct SkillView: View {
             Section("Progress") {
                 SkillProgressView(progress: skill.progress)
                 LabeledContent("Activities Completed", value: "\(skill.completedCount) / \(skill.requiredActivities)")
-                if skill.isMastered { Label("Stamp Earned", systemImage: "checkmark.seal") }
+                if skill.isMastered {
+                    Label("Stamp Earned", systemImage: "checkmark.seal.fill")
+                        .foregroundStyle(Color.gold)
+                }
             }
             Section("Completed Activities") {
                 if completed.isEmpty {
@@ -36,13 +41,19 @@ struct SkillView: View {
                 }
                 ForEach(completed) { activity in
                     Button { selectedActivity = activity } label: {
-                        Label(activity.name, systemImage: "checkmark.circle.fill")
+                        HStack(spacing: 12) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(Color.accentTeal)
+                            Text(activity.name)
+                                .foregroundStyle(Color.ink)
+                        }
                     }
-                    .foregroundStyle(.black)
                 }
             }
         }
+        .appScreenBackground()
         .navigationTitle(skill.name)
+        .tint(.accentTeal)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Skill Settings", systemImage: "gearshape") { showingSettings = true }

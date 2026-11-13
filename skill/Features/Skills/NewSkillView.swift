@@ -25,29 +25,39 @@ struct NewSkillView: View {
 
     var body: some View {
         Form {
-            Section("Similar Skills") {
-                ForEach(similar, id: \.name) { skill in
-                    Button(skill.name) {
-                        customSkill = skill.name
-                        activityGoal = skill.requiredActivities
-                        goalEdited = false
+            if !similar.isEmpty {
+                Section("Similar Skills") {
+                    ForEach(similar, id: \.name) { skill in
+                        Button(skill.name) {
+                            customSkill = skill.name
+                            activityGoal = skill.requiredActivities
+                            goalEdited = false
+                        }
                     }
                 }
             }
-            Section("Different Skills") {
-                ForEach(different, id: \.name) { skill in
-                    Button(skill.name) {
-                        customSkill = skill.name
-                        activityGoal = skill.requiredActivities
-                        goalEdited = false
+            if !different.isEmpty {
+                Section("Different Skills") {
+                    ForEach(different, id: \.name) { skill in
+                        Button(skill.name) {
+                            customSkill = skill.name
+                            activityGoal = skill.requiredActivities
+                            goalEdited = false
+                        }
                     }
                 }
             }
-            if loading { LoadingView(text: "Finding skills…") }
+            if loading {
+                Section {
+                    LoadingView(text: "Finding skills…")
+                }
+            }
             if let generationError {
                 Section {
                     Text(generationError).foregroundStyle(.secondary)
-                    Button("Try Again") { attempt += 1 }
+                    if SystemLanguageModel.default.unavailabilityMessage == nil {
+                        Button("Try Again") { attempt += 1 }
+                    }
                 }
             }
             Section {
@@ -70,6 +80,8 @@ struct NewSkillView: View {
         .disabled(saving)
         .navigationTitle("New Skill")
         .navigationBarBackButtonHidden(saving)
+        .tint(.accentTeal)
+        .appScreenBackground()
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }.disabled(saving)

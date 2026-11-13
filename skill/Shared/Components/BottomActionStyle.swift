@@ -4,7 +4,7 @@ extension View {
     func bottomActionStyle() -> some View {
         self.buttonStyle(.glass)
             .controlSize(.large)
-            .tint(.black)
+            .tint(.ink)
             .frame(maxWidth: .infinity)
             .padding()
     }

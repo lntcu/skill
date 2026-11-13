@@ -4,6 +4,7 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @Query private var skills: [Skill]
+    @AppStorage("hasSeededExamples") private var hasSeededExamples = false
 
     var body: some View {
         TabView {
@@ -18,9 +19,15 @@ struct ContentView: View {
                 }
             }
         }
+        .tint(.accentTeal)
         .task {
-            guard skills.isEmpty else { return }
+            guard skills.isEmpty else {
+                hasSeededExamples = true
+                return
+            }
+            guard !hasSeededExamples else { return }
             Skill.examples.forEach { context.insert($0) }
+            hasSeededExamples = true
         }
     }
 }

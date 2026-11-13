@@ -7,7 +7,9 @@ struct EmptyStateView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Image(systemName: symbol).font(.largeTitle)
+            Image(systemName: symbol)
+                .font(.largeTitle)
+                .foregroundStyle(Color.accentTeal)
             Text(title).font(.headline)
             if !message.isEmpty { Text(message).foregroundStyle(.secondary) }
         }

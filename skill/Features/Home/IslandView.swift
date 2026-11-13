@@ -31,42 +31,65 @@ struct IslandView: View {
     let island: IslandLayout.Island
 
     private var land: Color {
-        [Color(red: 0.52, green: 0.69, blue: 0.43), Color(red: 0.85, green: 0.78, blue: 0.52),
-         Color(red: 0.63, green: 0.68, blue: 0.59), Color(red: 0.55, green: 0.74, blue: 0.63)][island.theme]
+        switch island.theme {
+        case 0: .islandMeadow
+        case 1: .islandBeach
+        case 2: .islandAlpine
+        default: .islandLagoon
+        }
     }
     private var symbols: [String] {
         [["tree.fill", "tree.fill", "leaf.fill"], ["beach.umbrella.fill", "sun.max.fill", "tree.fill"],
          ["mountain.2.fill", "mountain.2.fill", "tree.fill"], ["tree.fill", "mountain.2.fill", "beach.umbrella.fill"]][island.theme]
     }
+    private var landScale: CGFloat { island.theme == 1 ? 0.72 : 0.88 }
+    private var symbolColor: Color {
+        island.theme == 2 ? .white.opacity(0.9) : .islandShadow.opacity(0.6)
+    }
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             ZStack {
                 let outline = IslandOutline(radii: island.radii, rotation: island.rotation)
-                outline.fill(Color(red: 0.94, green: 0.87, blue: 0.66))
-                    .shadow(color: .cyan.opacity(0.2), radius: 8)
-                outline.fill(land).scaleEffect(island.theme == 1 ? 0.72 : 0.88)
-                outline.fill(.black.opacity(0.045)).scaleEffect(0.58)
+                // A soft foam ring keeps the island seated in the water.
+                outline.fill(Color.islandFoam.opacity(0.7))
+                    .scaleEffect(1.035)
+                    .blur(radius: 2)
+                outline.fill(Color.islandSand)
+                outline.fill(land)
+                    .scaleEffect(landScale)
+                outline.fill(Color.islandShadow.opacity(0.05))
+                    .scaleEffect(0.58)
                 ForEach(island.features.indices, id: \.self) { index in
                     Image(systemName: symbols[index % symbols.count])
                         .font(.system(size: 22))
                         .frame(width: 28, height: 28)
                         .clipped()
-                        .foregroundStyle(island.theme == 2 ? .white.opacity(0.85) : .black.opacity(0.5))
-                        .position(x: island.features[index].x * island.size.width, y: island.features[index].y * island.size.height)
+                        .foregroundStyle(symbolColor)
+                        .position(x: island.features[index].x * island.size.width,
+                                  y: island.features[index].y * island.size.height)
                         .opacity(Double(index) / Double(island.features.count) < island.skill.progress ? 1 : 0.08)
                 }
                 .clipShape(outline)
-                outline.fill(.white.opacity((1 - island.skill.progress) * 0.4))
+                // Sunlit highlight across the top of the land.
+                outline.fill(
+                    LinearGradient(colors: [.white.opacity(0.22), .clear],
+                                   startPoint: .top, endPoint: .bottom)
+                )
+                // Unvisited islands stay softly veiled.
+                outline.fill(Color.islandFoam.opacity((1 - island.skill.progress) * 0.32))
             }
             .frame(width: island.size.width, height: island.size.height)
+            .compositingGroup()
+            .shadow(color: .islandShadow.opacity(0.28), radius: 10, y: 7)
 
             Text(island.skill.name)
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.islandLabel)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
                 .frame(width: island.size.width + 30)
-                .shadow(color: .white, radius: 3)
+                .shadow(color: .islandLabelShadow.opacity(0.85), radius: 3, y: 1)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(island.skill.name)
@@ -76,5 +99,6 @@ struct IslandView: View {
 
 #Preview {
     IslandView(island: IslandLayout(skills: Skill.examples).islands[0])
-        .padding(40).background(.cyan.opacity(0.1))
+        .padding(40)
+        .background(Color.islandSea)
 }

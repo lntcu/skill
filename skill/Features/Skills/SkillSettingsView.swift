@@ -36,6 +36,8 @@ struct SkillSettingsView: View {
         }
         .navigationTitle("Skill Settings")
         .navigationBarTitleDisplayMode(.inline)
+        .appScreenBackground()
+        .tint(.accentTeal)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }

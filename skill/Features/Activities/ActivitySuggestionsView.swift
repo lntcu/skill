@@ -30,11 +30,15 @@ struct ActivitySuggestionsView: View {
             if let error {
                 Section {
                     Text(error).foregroundStyle(.secondary)
-                    Button("Try Again") { attempt += 1 }
+                    if SystemLanguageModel.default.unavailabilityMessage == nil {
+                        Button("Try Again") { attempt += 1 }
+                    }
                 }
             }
         }
         .navigationTitle("Choose Activity")
+        .appScreenBackground()
+        .tint(.accentTeal)
         .task(id: attempt) {
             guard options.count < 3 else { return }
             await generate()

@@ -26,8 +26,10 @@ final class Skill {
 
     func assignStampStyle() {
         if stampHue == nil {
-            stampHue = Double.random(in: 0...1)
-            stampRotation = Double.random(in: -14...14)
+            // A curated passport palette reads better than a fully random hue.
+            let hues: [Double] = [0.49, 0.03, 0.10, 0.62, 0.86, 0.34]
+            stampHue = hues.randomElement() ?? 0.49
+            stampRotation = Double.random(in: -12...12)
             stampOffset = Double.random(in: -10...10)
         }
         if stampX == nil { stampX = Double.random(in: -1...1) }

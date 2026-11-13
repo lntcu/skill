@@ -19,6 +19,8 @@ struct NewActivityView: View {
             }
         }
         .navigationTitle("New Activity")
+        .appScreenBackground()
+        .tint(.accentTeal)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }

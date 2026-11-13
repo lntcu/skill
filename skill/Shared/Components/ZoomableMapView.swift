@@ -19,7 +19,6 @@ final class MapController<Content: View>: UIViewController, UIScrollViewDelegate
     private let host: UIHostingController<Content>
     private var mapSize: CGSize
     private var needsFit = true
-    private var overview = false
     private var resetToken = 0
     private var viewportSize = CGSize.zero
 
@@ -32,9 +31,11 @@ final class MapController<Content: View>: UIViewController, UIScrollViewDelegate
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(.islandSea)
+        view.backgroundColor = .clear
+        view.isOpaque = false
         scroll.delegate = self
-        scroll.backgroundColor = UIColor(.islandSea)
+        scroll.backgroundColor = .clear
+        scroll.isOpaque = false
         scroll.clipsToBounds = true
         scroll.showsHorizontalScrollIndicator = false
         scroll.showsVerticalScrollIndicator = false
@@ -43,7 +44,8 @@ final class MapController<Content: View>: UIViewController, UIScrollViewDelegate
         scroll.contentInsetAdjustmentBehavior = .never
         view.addSubview(scroll)
         addChild(host)
-        host.view.backgroundColor = UIColor(.islandSea)
+        host.view.backgroundColor = .clear
+        host.view.isOpaque = false
         scroll.addSubview(host.view)
         host.didMove(toParent: self)
         host.view.frame = CGRect(origin: .zero, size: mapSize)
@@ -64,7 +66,7 @@ final class MapController<Content: View>: UIViewController, UIScrollViewDelegate
         let fit = min(view.bounds.width / mapSize.width, view.bounds.height / mapSize.height)
         scroll.minimumZoomScale = fit
         scroll.maximumZoomScale = max(3, fit * 5)
-        scroll.zoomScale = overview ? fit : min(1, fit * 1.55)
+        scroll.zoomScale = min(1, fit * 1.25)
         centerContent()
         scroll.contentOffset = CGPoint(x: (mapSize.width * scroll.zoomScale - view.bounds.width) / 2,
                                        y: (mapSize.height * scroll.zoomScale - view.bounds.height) / 2)
@@ -75,7 +77,6 @@ final class MapController<Content: View>: UIViewController, UIScrollViewDelegate
         host.rootView = content
         if self.resetToken != resetToken {
             self.resetToken = resetToken
-            overview = true
             needsFit = true
             view.setNeedsLayout()
         }
@@ -114,8 +115,4 @@ final class MapController<Content: View>: UIViewController, UIScrollViewDelegate
         Image(systemName: "globe").resizable().padding(100).frame(width: 800, height: 800)
     }
     .frame(height: 420)
-}
-
-extension Color {
-    static let islandSea = Color(red: 0.88, green: 0.94, blue: 0.96)
 }

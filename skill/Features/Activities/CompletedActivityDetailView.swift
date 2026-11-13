@@ -13,7 +13,7 @@ struct CompletedActivityDetailView: View {
                         .resizable()
                         .scaledToFit()
                         .clipShape(.rect(cornerRadius: 16))
-						.glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16))
+                        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16))
                 }
                 Text(activity.details.isEmpty ? "No description saved." : activity.details)
                 if let date = activity.completedAt {
@@ -33,6 +33,8 @@ struct CompletedActivityDetailView: View {
         }
         .navigationTitle("Completed Activity")
         .navigationBarTitleDisplayMode(.inline)
+        .appScreenBackground()
+        .tint(.accentTeal)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") { dismiss() }
